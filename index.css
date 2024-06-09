@@ -1,11 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins" , sans-serif;
+}
+
 /* Sidebar Navigation */
 .sidebar {
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px;
+  width: 200px;
   height: 100%;
-  background-color: #1e88e5;
+  background-color: rgba(237, 28, 36, 0.9); 
   color: white;
   padding-top: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
@@ -19,11 +27,11 @@
 
 .sidebar-header {
   padding: 15px;
-  background: #1565c0;
+  background: #d31c29;
   text-align: center;
   font-size: 1.5em;
   font-weight: bold;
-  border-bottom: 1px solid #0d47a1;
+
 }
 
 .sidebar-menu {
@@ -34,20 +42,73 @@
 
 .sidebar-menu li {
   padding: 15px;
-  border-bottom: 1px solid #0d47a1;
 }
 
 .sidebar-menu li a {
   color: white;
   text-decoration: none;
   display: block;
-  font-size: 1.2em;
+  font-size: 1 em;
 }
 
 .sidebar-menu li a:hover {
-  background-color: #1565c0;
+  background-color: #d31c29;
   padding-left: 20px;
   transition: all 0.3s ease;
+}
+.navbar {
+  background-color: white;
+  color: #ed1c24;
+  padding: 10px;
+  text-align: left;
+}
+.title-nav {
+  display: flex;
+  align-items: center;
+  padding-left: 260px; /* Ensure this value is greater than sidebar width */
+  background-color: white; /* Match the background color of navbar */
+  z-index: 999; /* Ensure it is below sidebar z-index if needed */
+}
+.filter{
+display: flex;
+margin-left: auto;
+gap : 20px;
+}
+
+.title-nav .logo {
+  margin-right: 10px;
+}
+
+.title-nav .header-text {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+}
+
+.header-title {
+  font-size: x-large;
+  font-weight: bold;
+  margin: 0; /* Remove margin to reduce space */
+}
+
+.header-desc {
+  color: #ffd140;
+  font-size: large;
+  font-weight: bold;
+  margin: 0; /* Remove margin to reduce space */
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo img {
+  animation: rotate 5s linear infinite;
 }
 
 /* Toggle Button */
@@ -153,30 +214,24 @@
 }
 
 /* Other Styles */
-.bg-blue-1 {
-  background-color: rgb(100, 181, 246);
+.bg-button {
+  background-color:  white;
+  border : 2px solid rgb(226, 226, 226);
+  border-radius: 20px;
+
+}
+.bg-button:hover {
+  background-color: #ffffff;
+  
+  box-shadow: 0 2px 8px rgba(150, 150, 150, 0.2); /* Tambahkan bayangan */
 }
 
-.bg-blue-2 {
-  background-color: rgb(33, 150, 243);
-}
-
-.bg-blue-3 {
-  background-color: rgb(26, 130, 215);
-}
-
-.bg-blue-4 {
-  background-color: rgb(0, 93, 193);
-}
-
-.bg-blue-5 {
-  background-color: rgb(1, 27, 181);
-}
 
 .card-container {
-  border: 1px solid black;
+  border: 1px solid rgb(199, 199, 199);
   margin-top: 20px;
   padding: 20px;
+  border-radius: 20px;
 }
 
 .gap-10 {
@@ -213,6 +268,9 @@
 
 .text-15 {
   font-size: 15px;
+  color : #FF5733;
+  font-weight: bold;
+
 }
 
 .text-28 {
@@ -221,6 +279,7 @@
 
 .text-30 {
   font-size: 30px;
+  color : #FF5733;
 }
 
 .flex {
@@ -248,132 +307,110 @@
 }
 
 .select-size select {
-  background-color: #1e88e5;
+  background-color: rgba(237, 28, 36, 0.9); 
   border: none;
   color: white;
   width: 150px;
   padding: 10px 20px;
   border-radius: 10px;
-  box-shadow: 2px 2px #888888;
+  box-shadow: 1px 1px #888888;
 }
 
 .input-date input {
-  background-color: #1e88e5;
+  background-color: rgba(237, 28, 36, 0.9); 
   border: none;
   color: white;
   width: 150px;
   padding: 10px 20px;
   border-radius: 10px;
-  box-shadow: 2px 2px #888888;
+  box-shadow: 1px 1px #888888;
 }
 
 .container {
   height: 200%;
 }
 
-.kotak {
-  display: flex;
-  gap: 5px;
-  justify-content: space-between;
-}
-
-.konten {
-  background-color: #1e88e5;
-  text-align: center;
-  color: white;
-  border-radius: 10px;
-  width: 35%;
-  padding: 10px;
-}
-
-.konten-tengah {
-  background-color: #1e88e5;
-  text-align: center;
-  color: white;
-  border-radius: 10px;
-  width: 22%;
-  padding: 10px;
-}
-
-.text {
-  text-align: center;
-  align-items: center;
-  margin: auto;
-}
-
-.container-bawah {
-  margin-top: 20px;
-}
-
-.container {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 20px;
-}
-
 .rectangle {
   width: calc(50% - 30px);
   height: 40px;
-  background-color: #1e88e5;
+  background-color: #EC4724; 
   display: flex;
   justify-content: center;
   align-items: center;
   border-radius: 10px;
 }
 
-.text {
-  color: white;
-  font-size: 16px;
-  font-family: Roboto, sans-serif;
-}
-
 /* Styling About Us */
-.profile-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.profile {
-  text-align: center;
-  margin: 10px;
-}
-
-.profile-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-
-/* Styling About Us */
-.h1-about {
-  text-align: center;
-  color: #1565c0;
-}
-
-.profile {
-  text-align: center;
-  margin: 10px;
-}
-
-.profile-image {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-.profile-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-
-p.profile-name {
-  color: #0d47a1;
-  font-family: Cambria;
-  margin-top: 5px;
+.inti {
+  margin-top: 40px;
   font-weight: bold;
+  text-align: center;
+}
+::-webkit-scrollbar {
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 25px;
+}
+::-webkit-scrollbar-thumb {
+  background: #6e93f7;
+  border-radius: 25px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4070f4;
+}
+.container-us {
+    margin-top: 20px;
+    display: flex;
+    gap: 12px;
+    width: 80%; 
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    scroll-snap-type: x mandatory;
+    overflow-x: scroll;
+    scroll-padding: 30px;
+  }
+  
+  .container-us .card-us {
+    width: 250px; /* Lebar card tetap */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+    border-radius: 12px;
+    background: #fff;
+    scroll-snap-align: start;
+    box-shadow: 0 15px 25px rgba(0, 0, 0, 0.1);
+  }
+  
+.card-us .image {
+  height: 150px;
+  width: 150px;
+  padding: 4px;
+  background: white;
+  border-radius: 50%;
+}
+.image img {
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 5px solid #fff;
+  
+}
+.card-us h2 {
+  margin-top: 25px;
+  color: #333;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+}
+.card-us p {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 400;
+  color: #333;
+  text-align: center;
 }

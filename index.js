@@ -19,6 +19,15 @@ function isValidDate(d) {
 function isValidNumber(value) {
   return !isNaN(value) && isFinite(value);
 }
+function getColorForSize(sizeFilter) {
+  if (sizeFilter === 'XXL') {
+    return "rgba(255, 195, 0, 0.9)";  // kuning untuk XXL
+  } else if (sizeFilter === 'XL') {
+    return "rgba(255, 0, 0, 0.8)" // Merah untuk XL
+  } else {
+    return "rgba(255, 0, 0, 0.8)"; // Kuning sebagai warna default
+  }
+}
 
 async function visualizeData(sizeFilter = "", dateFilter = "") {
   const jsonData = allData.filter(order => {
@@ -79,8 +88,9 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
       labels: sizeLabels,
       datasets: [
         {
-          label: "# of Orders",
+          label: "Quantity",
           data: sizeData,
+          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
           borderWidth: 1,
         },
       ],
@@ -109,6 +119,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
         {
           label: "# of Orders",
           data: sizeData,
+          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
           borderWidth: 1,
         },
       ],
@@ -123,6 +134,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
         {
           label: "Quantity",
           data: sizeData,
+          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
           borderWidth: 1,
         },
       ],
@@ -144,7 +156,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
   });
 
   // Update barChart2 and lineChart
-  createCharts(jsonData);
+  createCharts(jsonData, sizeFilter);
 }
 
 function processChartData(data) {
@@ -168,7 +180,7 @@ function processChartData(data) {
   return { months, quantityData, amountData };
 }
 
-function createCharts(data) {
+function createCharts(data, sizeFilter = ""){
   const { months, quantityData, amountData } = processChartData(data);
 
   const cty = document.getElementById("barChart2")?.getContext("2d");
@@ -176,6 +188,7 @@ function createCharts(data) {
 
   if (window.barChart2 && typeof window.barChart2.destroy === 'function') window.barChart2.destroy();
   if (window.lineChart && typeof window.lineChart.destroy === 'function') window.lineChart.destroy();
+  
 
   window.barChart2 = new Chart(cty, {
     type: "bar",
@@ -186,6 +199,8 @@ function createCharts(data) {
           label: "quantity",
           data: quantityData,
           borderWidth: 1,
+          backgroundColor: getColorForSize(sizeFilter),
+          borderColor: getColorForSize(sizeFilter), 
         },
       ],
     },
@@ -214,6 +229,8 @@ function createCharts(data) {
           label: "amount",
           data: amountData,
           borderWidth: 1,
+          backgroundColor: getColorForSize(sizeFilter),
+          borderColor: getColorForSize(sizeFilter), 
         },
       ],
     },
