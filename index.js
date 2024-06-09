@@ -1,19 +1,50 @@
-// index.js
+let allData = [];
 
-// Function to fetch data from data.json
 async function fetchData() {
   const response = await fetch('data.json');
   const data = await response.json();
-  return data;
+  allData = data.filter(order => order.size === 'XL' || order.size === 'XXL'); // Filter data for XL and XXL sizes
+  return allData;
 }
 
-// Function to process and visualize data
-async function visualizeData() {
-  const jsonData = await fetchData();
+function parseDate(dateString) {
+  const [month, day, year] = dateString.split('/');
+  return new Date(`${year}-${month}-${day}`);
+}
 
-  // Parse the JSON data and extract necessary information
+function isValidDate(d) {
+  return d instanceof Date && !isNaN(d);
+}
+
+function isValidNumber(value) {
+  return !isNaN(value) && isFinite(value);
+}
+
+async function visualizeData(sizeFilter = "", dateFilter = "") {
+  const jsonData = allData.filter(order => {
+    const orderDate = parseDate(order.date);
+    const matchesSize = sizeFilter ? order.size === sizeFilter : true;
+    const matchesDate = dateFilter ? isValidDate(orderDate) && orderDate.toISOString().split('T')[0] === new Date(dateFilter).toISOString().split('T')[0] : true;
+    return matchesSize && matchesDate;
+  });
+
+  console.log("Filtered Data:", jsonData);
+
   const sizes = {};
+  let totalOrders = 0;
+  let totalIncome = 0;
+  let totalPizzas = 0;
+
   jsonData.forEach(order => {
+    const quantity = parseInt(order.quantity, 10);
+    const income = parseFloat(order.income);
+
+    if (isValidNumber(quantity) && isValidNumber(income)) {
+      totalOrders += quantity;
+      totalIncome += income;
+      totalPizzas += quantity;
+    }
+    
     if (sizes[order.size]) {
       sizes[order.size] += 1;
     } else {
@@ -21,19 +52,28 @@ async function visualizeData() {
     }
   });
 
-  console.log(sizes);
+  const avgPizzaPerOrder = totalOrders ? (totalPizzas / totalOrders).toFixed(2) : 0;
+  const avgOrderValue = totalOrders ? (totalIncome / totalOrders).toFixed(2) : 0;
 
-  // {} => []
+  document.getElementById('number-of-orders').innerText = isValidNumber(totalOrders) ? totalOrders : '0';
+  document.getElementById('total-revenue').innerText = isValidNumber(totalIncome) ? `$${totalIncome.toFixed(2)}` : '$0.00';
+  document.getElementById('avg-pizza-per-order').innerText = isValidNumber(avgPizzaPerOrder) ? avgPizzaPerOrder : '0';
+  document.getElementById('avg-order-value').innerText = isValidNumber(avgOrderValue) ? avgOrderValue : '0';
+  document.getElementById('count-of-pizza-sizes').innerText = Object.keys(sizes).length;
 
   const sizeLabels = Object.keys(sizes);
   const sizeData = Object.values(sizes);
 
-  // DOM
-  const ctx = document.getElementById("myChart");
-  const ctp = document.getElementById("pieChart");
+  const ctx = document.getElementById("myChart")?.getContext("2d");
+  const ctp = document.getElementById("pieChart")?.getContext("2d");
+  const ctxBar = document.getElementById("barChart")?.getContext("2d");
 
-  // Bar Chart
-  new Chart(ctx, {
+  // Clear existing charts if any
+  if (window.barChart && typeof window.barChart.destroy === 'function') window.barChart.destroy();
+  if (window.pieChart && typeof window.pieChart.destroy === 'function') window.pieChart.destroy();
+  if (window.barChart3 && typeof window.barChart3.destroy === 'function') window.barChart3.destroy();
+
+  window.barChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels: sizeLabels,
@@ -61,8 +101,7 @@ async function visualizeData() {
     },
   });
 
-  // Pie Chart
-  new Chart(ctp, {
+  window.pieChart = new Chart(ctp, {
     type: "pie",
     data: {
       labels: sizeLabels,
@@ -75,82 +114,137 @@ async function visualizeData() {
       ],
     },
   });
-}
 
-// Call the function to fetch and visualize data
-visualizeData();
+  window.barChart3 = new Chart(ctxBar, {
+    type: "bar",
+    data: {
+      labels: sizeLabels,
+      datasets: [
+        {
+          label: "Quantity",
+          data: sizeData,
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      scales: {
+        x: {
+          grid: {
+            display: false
+          }
+        },
+        y: {
+          grid: {
+            display: false
+          }
+        },
+      },
+    },
+  });
+
+  // Update barChart2 and lineChart
+  createCharts(jsonData);
+}
 
 function processChartData(data) {
   const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   let quantityData = new Array(12).fill(0);
   let amountData = new Array(12).fill(0);
-  
+
   data.forEach(order => {
-    const date = new Date(order.date);
-    const month = date.getMonth();
-    quantityData[month] += parseInt(order.quantity, 10);
-    amountData[month] += parseFloat(order.income);
-});
-return { months, quantityData, amountData };
+    const date = parseDate(order.date);
+    if (isValidDate(date)) {
+      const month = date.getMonth();
+      const quantity = parseInt(order.quantity, 10);
+      const income = parseFloat(order.income);
+
+      if (isValidNumber(quantity) && isValidNumber(income)) {
+        quantityData[month] += quantity;
+        amountData[month] += income;
+      }
+    }
+  });
+  return { months, quantityData, amountData };
 }
 
-async function createCharts() {
-  const data = await fetchData();
+function createCharts(data) {
   const { months, quantityData, amountData } = processChartData(data);
-  
-  const cty = document.getElementById("barChart2");
-  const ctz = document.getElementById("lineChart");
 
-// chart4
-new Chart(cty, {
-  type: "bar",
-  data: {
+  const cty = document.getElementById("barChart2")?.getContext("2d");
+  const ctz = document.getElementById("lineChart")?.getContext("2d");
+
+  if (window.barChart2 && typeof window.barChart2.destroy === 'function') window.barChart2.destroy();
+  if (window.lineChart && typeof window.lineChart.destroy === 'function') window.lineChart.destroy();
+
+  window.barChart2 = new Chart(cty, {
+    type: "bar",
+    data: {
       labels: months,
       datasets: [
-          {
-              label: "quantity",
-              data: quantityData,
-              borderWidth: 1,
-          },
+        {
+          label: "quantity",
+          data: quantityData,
+          borderWidth: 1,
+        },
       ],
-  },
-  options: {
+    },
+    options: {
       indexAxis: 'y',
       scales: {
-          x: {
-              stacked: true,
-          },
-          y: {
-              stacked: true,
-              grid: {
-                  display: false
-              }
-          },
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+          grid: {
+            display: false
+          }
+        },
       },
-  },
-});
+    },
+  });
 
-// chart5
-new Chart(ctz, {
-  type: 'line',
-  data: {
+  window.lineChart = new Chart(ctz, {
+    type: 'line',
+    data: {
       labels: months,
       datasets: [
-          {
-              label: "amount",
-              data: amountData,
-              borderWidth: 1,
-          },
+        {
+          label: "amount",
+          data: amountData,
+          borderWidth: 1,
+        },
       ],
-  },
-  options: {
+    },
+    options: {
       scales: {
-          y: {
-              stacked: true
-          }
+        y: {
+          stacked: true
+        }
       }
-  },
+    },
+  });
+}
+
+fetchData().then(() => {
+  visualizeData();
 });
 
-}
-createCharts();
+// Add event listener to the size filter
+document.getElementById('size').addEventListener('change', (event) => {
+  const selectedSize = event.target.value;
+  const selectedDate = document.getElementById('date').value;
+  console.log("Selected Size:", selectedSize);
+  console.log("Selected Date:", selectedDate);
+  visualizeData(selectedSize, selectedDate);
+});
+
+// Add event listener to the date filter
+document.getElementById('date').addEventListener('change', (event) => {
+  const selectedDate = event.target.value;
+  const selectedSize = document.getElementById('size').value;
+  console.log("Selected Date:", selectedDate);
+  console.log("Selected Size:", selectedSize);
+  visualizeData(selectedSize, selectedDate);
+});
