@@ -1,12 +1,13 @@
 let allData = [];
 
+// Fungsi untuk mengimpor dan memproses data
 async function fetchData() {
   const response = await fetch('data.json');
   const data = await response.json();
-  allData = data.filter(order => order.size === 'XL' || order.size === 'XXL'); // Filter data for XL and XXL sizes
+  allData = data.filter(order => order.size === 'XL' || order.size === 'XXL'); // Menyaring data untuk ukuran XL dan XXL
   return allData;
 }
-
+// Fungsi untuk memvalidasi tanggal
 function parseDate(dateString) {
   const [month, day, year] = dateString.split('/');
   return new Date(`${year}-${month}-${day}`);
@@ -19,28 +20,33 @@ function isValidDate(d) {
 function isValidNumber(value) {
   return !isNaN(value) && isFinite(value);
 }
+
+// Fungsi untuk mendapatkan warna berdasarkan ukuran
 function getColorForSize(sizeFilter) {
   if (sizeFilter === 'XXL') {
-    return "rgba(255, 195, 0, 0.9)";  // kuning untuk XXL
+    return "rgba(255, 195, 0, 0.9)";  // Kuning untuk XXL
   } else if (sizeFilter === 'XL') {
-    return "rgba(255, 0, 0, 0.8)" // Merah untuk XL
+    return "rgba(255, 0, 0, 0.8)";  // Merah untuk XL
   } else {
-    return "rgba(255, 0, 0, 0.8)"; // Kuning sebagai warna default
+    return "rgba(255, 0, 0, 0.8)";  // Warna default
   }
 }
 
-async function visualizeData(sizeFilter = "", dateFilter = "") {
+// Fungsi untuk memvisualisasikan data
+async function visualizeData(sizeFilter = "", startDate = "", endDate = "") {
   const jsonData = allData.filter(order => {
     const orderDate = parseDate(order.date);
     const matchesSize = sizeFilter ? order.size === sizeFilter : true;
-    const matchesDate = dateFilter ? isValidDate(orderDate) && orderDate.toISOString().split('T')[0] === new Date(dateFilter).toISOString().split('T')[0] : true;
-    return matchesSize && matchesDate;
+    const matchesStartDate = startDate ? isValidDate(orderDate) && orderDate >= new Date(startDate) : true;
+    const matchesEndDate = endDate ? isValidDate(orderDate) && orderDate <= new Date(endDate) : true;
+    return matchesSize && matchesStartDate && matchesEndDate;
   });
 
   console.log("Filtered Data:", jsonData);
 
   const sizes = {};
-  let totalOrders = 0;
+  let totalOrders = 0; // jumlah order
+  let totalQuantity = 0; // jumlah total berdasarkan quantity
   let totalIncome = 0;
   let totalPizzas = 0;
 
@@ -49,15 +55,16 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
     const income = parseFloat(order.income);
 
     if (isValidNumber(quantity) && isValidNumber(income)) {
-      totalOrders += quantity;
+      totalOrders += 1; // Menambah jumlah order
+      totalQuantity += quantity; // Menambah quantity
       totalIncome += income;
       totalPizzas += quantity;
     }
-    
+
     if (sizes[order.size]) {
-      sizes[order.size] += 1;
+      sizes[order.size] += quantity;  // Menggunakan quantity daripada hanya menghitung order
     } else {
-      sizes[order.size] = 1;
+      sizes[order.size] = quantity;  // Menggunakan quantity daripada hanya menghitung order
     }
   });
 
@@ -72,6 +79,8 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
 
   const sizeLabels = Object.keys(sizes);
   const sizeData = Object.values(sizes);
+  const totalOrdersCount = sizeData.reduce((acc, count) => acc + count, 0);
+  const sizePercentages = sizeData.map(count => ((count / totalOrdersCount) * 100).toFixed(2));
 
   const ctx = document.getElementById("myChart")?.getContext("2d");
   const ctp = document.getElementById("pieChart")?.getContext("2d");
@@ -90,7 +99,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
         {
           label: "Quantity",
           data: sizeData,
-          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
+          backgroundColor: sizeLabels.map(label => getColorForSize(label)),
           borderWidth: 1,
         },
       ],
@@ -111,20 +120,34 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
     },
   });
 
-  window.pieChart = new Chart(ctp, {
+
+window.pieChart = new Chart(ctp, {
     type: "pie",
     data: {
       labels: sizeLabels,
       datasets: [
         {
-          label: "# of Orders",
-          data: sizeData,
-          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
+          label: "Percentage",
+          data: sizePercentages,
+          backgroundColor: sizeLabels.map(label => getColorForSize(label)),
           borderWidth: 1,
         },
       ],
     },
-  });
+    options: {
+        plugins: {
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const value = context.raw || 0;
+                        return `Percentage: ${value}%`;
+                    },
+                },
+            },
+        },
+    },
+});
+
 
   window.barChart3 = new Chart(ctxBar, {
     type: "bar",
@@ -134,7 +157,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
         {
           label: "Quantity",
           data: sizeData,
-          backgroundColor: sizeLabels.map(label => label === 'XXL' ? "rgba(255, 195, 0, 0.8)" : "rgba(255, 0, 0, 0.8)"),
+          backgroundColor: sizeLabels.map(label => getColorForSize(label)),
           borderWidth: 1,
         },
       ],
@@ -162,7 +185,7 @@ async function visualizeData(sizeFilter = "", dateFilter = "") {
 function processChartData(data) {
   const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   let quantityData = new Array(12).fill(0);
-  let amountData = new Array(12).fill(0);
+  let incomeData = new Array(12).fill(0);
 
   data.forEach(order => {
     const date = parseDate(order.date);
@@ -173,15 +196,15 @@ function processChartData(data) {
 
       if (isValidNumber(quantity) && isValidNumber(income)) {
         quantityData[month] += quantity;
-        amountData[month] += income;
+        incomeData[month] += income;
       }
     }
   });
-  return { months, quantityData, amountData };
+  return { months, quantityData, incomeData };
 }
 
-function createCharts(data, sizeFilter = ""){
-  const { months, quantityData, amountData } = processChartData(data);
+function createCharts(data, sizeFilter = "") {
+  const { months, quantityData, incomeData } = processChartData(data);
 
   const cty = document.getElementById("barChart2")?.getContext("2d");
   const ctz = document.getElementById("lineChart")?.getContext("2d");
@@ -189,14 +212,13 @@ function createCharts(data, sizeFilter = ""){
   if (window.barChart2 && typeof window.barChart2.destroy === 'function') window.barChart2.destroy();
   if (window.lineChart && typeof window.lineChart.destroy === 'function') window.lineChart.destroy();
   
-
   window.barChart2 = new Chart(cty, {
     type: "bar",
     data: {
       labels: months,
       datasets: [
         {
-          label: "quantity",
+          label: "Quantity",
           data: quantityData,
           borderWidth: 1,
           backgroundColor: getColorForSize(sizeFilter),
@@ -226,20 +248,35 @@ function createCharts(data, sizeFilter = ""){
       labels: months,
       datasets: [
         {
-          label: "amount",
-          data: amountData,
+          label: "Income",
+          data: incomeData, 
           borderWidth: 1,
           backgroundColor: getColorForSize(sizeFilter),
-          borderColor: getColorForSize(sizeFilter), 
+          borderColor: getColorForSize(sizeFilter),
         },
       ],
     },
     options: {
       scales: {
         y: {
-          stacked: true
+          stacked: true,
+          ticks: {
+            callback: function(value) {
+              return '$' + value.toFixed(2);
+            }
+          }
         }
-      }
+      },
+      plugins: {
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const value = context.raw || 0;
+              return `Income: $${value.toFixed(2)}`;
+            },
+          },
+        },
+      },
     },
   });
 }
@@ -248,20 +285,35 @@ fetchData().then(() => {
   visualizeData();
 });
 
-// Add event listener to the size filter
+// Menambahkan event listener untuk filter ukuran
 document.getElementById('size').addEventListener('change', (event) => {
   const selectedSize = event.target.value;
-  const selectedDate = document.getElementById('date').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
   console.log("Selected Size:", selectedSize);
-  console.log("Selected Date:", selectedDate);
-  visualizeData(selectedSize, selectedDate);
+  console.log("Selected Start Date:", startDate);
+  console.log("Selected End Date:", endDate);
+  visualizeData(selectedSize, startDate, endDate);
 });
 
-// Add event listener to the date filter
-document.getElementById('date').addEventListener('change', (event) => {
-  const selectedDate = event.target.value;
+// Menambahkan event listener untuk filter tanggal mulai
+document.getElementById('startDate').addEventListener('change', (event) => {
+  const startDate = event.target.value;
+  const endDate = document.getElementById('endDate').value;
   const selectedSize = document.getElementById('size').value;
-  console.log("Selected Date:", selectedDate);
+  console.log("Selected Start Date:", startDate);
+  console.log("Selected End Date:", endDate);
   console.log("Selected Size:", selectedSize);
-  visualizeData(selectedSize, selectedDate);
+  visualizeData(selectedSize, startDate, endDate);
+});
+
+// Menambahkan event listener untuk filter tanggal akhir
+document.getElementById('endDate').addEventListener('change', (event) => {
+  const endDate = event.target.value;
+  const startDate = document.getElementById('startDate').value;
+  const selectedSize = document.getElementById('size').value;
+  console.log("Selected End Date:", endDate);
+  console.log("Selected Start Date:", startDate);
+  console.log("Selected Size:", selectedSize);
+  visualizeData(selectedSize, startDate, endDate);
 });

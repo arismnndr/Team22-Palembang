@@ -1,24 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="index.css">
-  <title>Palembang - Team 22</title>
-</head>
-<body>
-  <nav class="navbar" style="display: flex; align-items: center;">
-    <div class="title-nav">
-      <div class="logo">
-        <img src="pizza.png" alt="Pizza Logo" class="logo" width="100" height="100">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="index.css" />
+    <title>Palembang - Team 22</title>
+  </head>
+  <body>
+    <nav class="navbar" style="display: flex; align-items: center">
+      <div class="title-nav">
+        <div class="logo">
+          <img src="pizza.png" alt="Pizza Logo" class="logo" width="100" height="100" />
+        </div>
+        <div class="header-text">
+          <p class="header-title">Dashboard Pizza Sales</p>
+          <p class="header-desc">Team 22 - Section Palembang</p>
+        </div>
       </div>
-      <div class="header-text">
-        <p class="header-title">Dashboard Pizza Sales</p>
-        <p class="header-desc">Team 22 - Section Palembang</p>
-      </div>
-    </div>    
-    <div class="filter">
+      <div class="filter">
         <div class="select-size">
+          <label for="size"></label>
           <select name="size" id="size">
             <option value="">All Sizes</option>
             <option value="XXL">XXL</option>
@@ -26,77 +27,80 @@
           </select>
         </div>
         <div class="input-date">
-        <input type="date" id="date" name="date" placeholder="Select Date">
+          <label for="startDate">Start Date:</label>
+          <input type="date" id="startDate" name="startDate">
+          <label for="endDate">End Date:</label>
+          <input type="date" id="endDate" name="endDate">
+        </div>
       </div>
-    </div>
-    <div class="sidebar">
-      <div class="sidebar-header">
-        <h4>Welcome</h4>
+      <div class="sidebar">
+        <div class="sidebar-header">
+          <h4>Welcome</h4>
+        </div>
+        <ul class="sidebar-menu">
+          <li><a href="index.html">Dashboard</a></li>
+          <li><a href="about.html">About Us</a></li>
+        </ul>
       </div>
-      <ul class="sidebar-menu">
-        <li><a href="index.html">Dashboard</a></li>
-        <li><a href="about.html">About Us</a></li>
-      </ul>
-</div>
-  </nav>
-  <header></header>
-  <main class="main-content">
-    <div class="flex gap-10 justify-between mt-20" id="order-summary">
-      <div class="bg-button p-data text-center text-white  w-20">
-        <div class="text-15">Number of Orders</div>
-        <div class="text-30" id="number-of-orders">0</div>
+    </nav>
+    <header></header>
+    <main class="main-content">
+      <div class="flex gap-10 justify-between mt-20" id="order-summary">
+        <div class="bg-button p-data text-center text-white w-20">
+          <div class="text-15">Number of Orders</div>
+          <div class="text-30" id="number-of-orders">0</div>
+        </div>
+        <div class="bg-button p-data text-center text-white w-20">
+          <div class="text-15">AVG Pizza per Order</div>
+          <div class="text-30" id="avg-pizza-per-order">0</div>
+        </div>
+        <div class="bg-button p-data text-center text-white w-20">
+          <div class="text-15">Total Revenue</div>
+          <div class="text-30" id="total-revenue">$0.00</div>
+        </div>
+        <div class="bg-button p-data text-center text-white w-20">
+          <div class="text-15">AVG Order Value</div>
+          <div class="text-30" id="avg-order-value">0</div>
+        </div>
+        <div class="bg-button p-data text-center text-white w-20">
+          <div class="text-15">Count of Pizza Sizes</div>
+          <div class="text-30" id="count-of-pizza-sizes">0</div>
+        </div>
       </div>
-      <div class="bg-button p-data text-center text-white w-20">
-        <div class="text-15">AVG Pizza per Order</div>
-        <div class="text-30" id="avg-pizza-per-order">0</div>
-      </div>
-      <div class="bg-button p-data text-center text-white w-20">
-        <div class="text-15">Total Revenue</div>
-        <div class="text-30" id="total-revenue">$0.00</div>
-      </div>
-      <div class="bg-button p-data text-center text-white w-20">
-        <div class="text-15">AVG Order Value</div>
-        <div class="text-30" id="avg-order-value">0</div>
-      </div>
-      <div class="bg-button p-data text-center text-white w-20">
-        <div class="text-15">Count of Pizza Sizes</div>
-        <div class="text-30" id="count-of-pizza-sizes">0</div>
-      </div>
-    </div>
- 
-    <div class="flex gap-20">
-      <div class="card-container w-40 ">
-        <p  class="padding-buttom"> Total Order for Pizza Size XL and XXL by Year</p>
-        <hr class="pb">
-        <canvas id="myChart"></canvas>
-      </div>
-      <div class="card-container w-20">
-        <p  class="padding-buttom">% Sales by Pizza Size</p>
-        <hr class="pb">
-        <canvas id="pieChart"></canvas>
-      </div>
-      <div class="card-container w-40"> 
-        <p  class="padding-buttom">Total Order for Pizza Type the_greek by Year </p>
-        <hr class="pb">
-        <canvas id="barChart"></canvas>
-      </div>
-    </div>
-    <div class="flex justify-between gap-10">
-      <div class="card-container">
-        <p  class="padding-buttom">Monthly Trend for Total Order</p>
-        <hr class="pb">
-        <canvas width="450" height="300" id="barChart2"></canvas>
-      </div>
-      <div class="card-container">
-        <p  class="padding-buttom">Monthly Trend for Total Income</p>
-        <hr class="pb">
-        <canvas width="450" height="300" id="lineChart"></canvas>
-      </div>
-    </div>
-  </main>
-  <footer></footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="index.js"></script>
-</body>
+      <div class="flex gap-20">
+        <div class="card-container w-40">
+          <p class="padding-buttom">Total Order for Pizza Size XL and XXL by Year</p>
+          <hr class="pb" />
+          <canvas id="myChart"></canvas>
+        </div>
+        <div class="card-container w-20">
+          <p class="padding-buttom">% Sales by Pizza Size</p>
+          <hr class="pb" />
+          <canvas id="pieChart"></canvas>
+        </div>
+        <div class="card-container w-40">
+          <p class="padding-buttom">Total Order for Pizza Type the_greek by Year</p>
+          <hr class="pb" />
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+      <div class="flex justify-between gap-10">
+        <div class="card-container">
+          <p class="padding-buttom">Monthly Trend for Total Order</p>
+          <hr class="pb" />
+          <canvas width="450" height="300" id="barChart2"></canvas>
+        </div>
+        <div class="card-container">
+          <p class="padding-buttom">Monthly Trend for Total Income</p>
+          <hr class="pb" />
+          <canvas width="450" height="300" id="lineChart"></canvas>
+        </div>
+      </div>
+    </main>
+    <footer></footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="index.js"></script>
+  </body>
 </html>
